@@ -1,6 +1,8 @@
 // clears when the server shuts down
 const themes = {
-  
+  testTheme: {
+    keyword: 'testTheme', colorOne: '#8898B8', colorTwo: '#F0DCD7', colorThree: '#F49B96', colorFour: '#4E567D', colorFive: '#76B5B0',
+  },
 };
 
 const respondJSON = (request, response, status, object) => {
@@ -16,16 +18,16 @@ const respondJSONHead = (request, response, status) => {
 
 const getNewTheme = (request, response) => {
 
-}
+};
 
 const getSavedTheme = (request, response, keyword) => {
-  var responseJSON;
+  let responseJSON;
   // setup error handling for key not found
-  if (theme[keyword] != null) {
+  if (themes[keyword] != null) {
     responseJSON = themes[keyword];
   } else {
-    // create error message for response if theme wasn't found 
-    const responseJSON = {
+    // create error message for response if theme wasn't found
+    responseJSON = {
       message: 'The resource you are looking for was not found.',
       id: 'notFound',
     };
@@ -35,19 +37,26 @@ const getSavedTheme = (request, response, keyword) => {
   }
 
   return respondJSON(request, response, 200, responseJSON);
-}
+};
 
-const getSavedThemes = (request, response) => {
+const getSavedThemes = (request, response, body) => {
   const responseJSON = {
-    themes,
+    message: themes[body.keyword],
   };
+  
+  // check for missing params
+  if (!body.keyword) {
+    responseJSON.id = 'missingParams';
+    return respondJSON(request, response, 400, responseJSON);
+  }
+
+  responseJSON.theme = themes[body.keyword];
+  responseJSON.message = 'Success';
 
   return respondJSON(request, response, 200, responseJSON);
-}
+};
 
-const getSavedThemesMeta = (request, response) => {
-  return respondJSONHead(request, response, 200);
-}
+const getSavedThemesMeta = (request, response) => respondJSONHead(request, response, 200);
 
 const addTheme = (request, response, body) => {
   // default json message
@@ -56,7 +65,8 @@ const addTheme = (request, response, body) => {
   };
 
   // check for missing params
-  if (!body.keyword || !body.colorOne || !body.colorTwo || !body.colorThree || !body.colorFour || !body.colorFive) {
+  if (!body.keyword || !body.colorOne || !body.colorTwo
+    || !body.colorThree || !body.colorFour || !body.colorFive) {
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
@@ -86,7 +96,7 @@ const addTheme = (request, response, body) => {
   }
   // Response without content if the user already exists
   return respondJSONHead(request, response, responseCode);
-}
+};
 
 const notReal = (request, response) => {
   // create error message for response
@@ -103,7 +113,7 @@ const notReal = (request, response) => {
 const notRealMeta = (request, response) => {
   // return a 404 without an error message
   respondJSONHead(request, response, 404);
-}
+};
 
 /*
 const addUser = (request, response, body) => {
@@ -149,4 +159,5 @@ module.exports = {
   notRealMeta,
   getNewTheme,
   getSavedTheme,
+  addTheme,
 };

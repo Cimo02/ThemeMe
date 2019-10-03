@@ -12,61 +12,91 @@ const urlStruct = {
   GET: {
     '/': htmlHandler.getIndex,
     '/style.css': htmlHandler.getCSS,
-    '/getUsers': jsonHandler.getUsers,
+    '/getNewTheme': jsonHandler.getNewTheme,
+    '/getSavedTheme': jsonHandler.getSavedTheme,
     notReal: jsonHandler.notReal,
   },
   HEAD: {
-    '/getUsers': jsonHandler.getUsersMeta,
+    '/getNewTheme': jsonHandler.getNewThemeMeta,
+    '/getSavedTheme': jsonHandler.getSavedThemeMeta,
     notReal: jsonHandler.notRealMeta,
   },
 };
 
-const handlePost = (request, response, parsedUrl) => {
-  // if post is to /addUser (our only POST url)
-  if (parsedUrl.pathname === '/addUser') {
-    const res = response;
+const handleAddTheme = (request, response, parsedUrl) => {
+  const res = response;
 
-    // create body
-    const body = [];
+  // create body
+  const body = [];
 
-    // if we get an error throw a bad request
-    request.on('error', (err) => {
-      console.dir(err);
-      res.statusCode = 400;
-      res.end();
-    });
+  // if we get an error throw a bad request
+  request.on('error', (err) => {
+    console.dir(err);
+    res.statusCode = 400;
+    res.end();
+  });
 
-    // on 'data' is for each byte of data that comes in
-    // from the upload. We will add it to our byte array.
-    request.on('data', (chunk) => {
-      body.push(chunk);
-    });
+  // on 'data' is for each byte of data that comes in
+  // from the upload. We will add it to our byte array.
+  request.on('data', (chunk) => {
+    body.push(chunk);
+  });
 
-    // on end of upload stream.
-    request.on('end', () => {
-      // combine and parse body byte data
-      const bodyString = Buffer.concat(body).toString();
-      const bodyParams = query.parse(bodyString);
+  // on end of upload stream.
+  request.on('end', () => {
+    // combine and parse body byte data
+    const bodyString = Buffer.concat(body).toString();
+    const bodyParams = query.parse(bodyString);
 
-      // pass to our addUser function
-      jsonHandler.addUser(request, res, bodyParams);
-    });
-  }
+    // pass to our addUser function
+    jsonHandler.addTheme(request, res, bodyParams);
+  });
+};
+
+const handleGetSavedTheme = (request, response, parsedUrl) => {
+  const res = response;
+
+  // create body
+  const body = [];
+
+  // if we get an error throw a bad request
+  request.on('error', (err) => {
+    console.dir(err);
+    res.statusCode = 400;
+    res.end();
+  });
+
+  // on 'data' is for each byte of data that comes in
+  // from the upload. We will add it to our byte array.
+  request.on('data', (chunk) => {
+    body.push(chunk);
+  });
+
+  // on end of upload stream.
+  request.on('end', () => {
+    // combine and parse body byte data
+    const bodyString = Buffer.concat(body).toString();
+    const bodyParams = query.parse(bodyString);
+
+    // pass to our addUser function
+    jsonHandler.getSavedTheme(request, res, bodyParams);
+  });
 };
 
 // send this function request and pre-filled response objects.
 const onRequest = (request, response) => {
   // parse the url using the url module
   const parsedUrl = url.parse(request.url);
-
+  console.log(request.action);
+  
   if (request.method === 'POST') {
-    handlePost(request, response, parsedUrl);
+    handleAddTheme(request, response, parsedUrl);
+  } else if (request.action === '/getSavedTheme') {
+    handleGetSavedTheme(request, response, parsedUrl);
+  } else if (urlStruct[request.method][parsedUrl.pathname]) {
+    urlStruct[request.method][parsedUrl.pathname](request, response);
   } else {
-    if (urlStruct[request.method][parsedUrl.pathname]) {
-      urlStruct[request.method][parsedUrl.pathname](request, response);
-    } else {
-      urlStruct[request.method].notReal(request, response);
-    }
+    urlStruct[request.method].notReal(request, response);
   }
 };
 

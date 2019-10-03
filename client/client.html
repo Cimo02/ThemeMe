@@ -21,11 +21,13 @@
       }
       
       //if users in response, add to screen
-      if(obj.users) {
+      if(obj.theme) {
+        /*
         const userList = document.createElement('p');
         const users = JSON.stringify(obj.users);
         userList.textContent = users;
         content.appendChild(userList);
+        */
       }
     };
 
@@ -59,21 +61,19 @@
       if (parseResponse) { parseJSON(xhr, content); } 
     };
 
-    //function to send our post request
-    const sendPost = (e, nameForm) => {
+    // for saving themes to the server
+    const sendPost = (e, saveButton, keywordField, colorCards) => {
       //grab the forms action (url to go to)
+      console.log("saving theme...")
       //and method (HTTP method - POST in this case)
-      const nameAction = nameForm.getAttribute('action');
-      const nameMethod = nameForm.getAttribute('method');
+      const saveAction = saveButton.getAttribute('action');
+      const saveMethod = saveButton.getAttribute('method');
       
-      //grab the form's name and age fields so we can check user input
-      const nameField = nameForm.querySelector('#nameField');
-      const ageField = nameForm.querySelector('#ageField');
-      
+      console.log(saveAction + " " + saveMethod);
       //create a new Ajax request (remember this is asynchronous)
       const xhr = new XMLHttpRequest();
       //set the method (POST) and url (action field from form)
-      xhr.open(nameMethod, nameAction);
+      xhr.open(saveMethod, saveAction);
       
       //set our request type to x-www-form-urlencoded
       //which is one of the common types of form data. 
@@ -86,31 +86,44 @@
       xhr.onload = () => handleResponse(xhr, true);
       
       // add our field data to our request data
-      const formData = `name=${nameField.value}&age=${ageField.value}`;
-      
+      const formData = `keyword=${keywordField.value}&colorOne=${colorCards[0].style.backgroundColor}&colorTwo=${colorCards[1].style.backgroundColor}&colorThree=${colorCards[2].style.backgroundColor}&colorFour=${colorCards[3].style.backgroundColor}&colorFive=${colorCards[4].style.backgroundColor}`;
+      console.log(formData);
+
       //send our request with the data
       xhr.send(formData);
-    
+      
       //prevent the browser's default action (to send the form on its own)
       e.preventDefault();
       //return false to prevent the browser from trying to change page
       return false;
     };
 
-    const sendGetHead = (e, userForm) => {
-      const method = userForm.querySelector('#methodSelect').value;
-      const url = userForm.querySelector('#urlField').value; // always "/getUsers"???
+    const sendNewThemeRequest = (e) => {
+      var image = document.getElementById("imagePreview");
+      var imageCtx = c.getContext("2d");
 
+      // add theme type here
+      // add image data here
+      // send it
+    };
+
+    const sendSavedThemeRequest = (e, loadButton, keywordField) => {
+      const method = loadButton.getAttribute('method');
+      const action = loadButton.getAttribute('action');
+
+      console.log(action + " " + method);
       // create and open a new AJAX request
       const xhr = new XMLHttpRequest();
 
       // open request
-      xhr.open(method, url);
+      xhr.open(method, action);
 
+      // set request header
+      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
       xhr.setRequestHeader('Accept', 'application/json');
 
       // handle the response
-      if (method == 'get'){
+      if (method === 'get'){
         xhr.onload = () => handleResponse(xhr, true);
       }
       else {
@@ -118,7 +131,10 @@
       }
       
       // send request
-      xhr.send();
+      const keyword = `keyword=${keywordField.value}`;
+      console.log(keyword);
+
+      xhr.send(keyword);
       //cancel browser's default action
       e.preventDefault();
       //return false to prevent page redirection from a form
@@ -126,22 +142,31 @@
     };
 
     const init = () => {
-      const nameForm = document.querySelector('#nameForm');
-      const userForm = document.querySelector('#userForm');
+      const loadButton = document.querySelector('#loadButton');
+      const saveButton = document.querySelector('#saveButton');
+      const keywordField = document.querySelector('#keywordField');
+      const colorCards = [
+        document.querySelector('#colorOne'),
+        document.querySelector('#colorTwo'),
+        document.querySelector('#colorThree'),
+        document.querySelector('#colorFour'),
+        document.querySelector('#colorFive'),
+      ];
 
 	    //functions to call sendAjax for us with the correct parameters
-      const postRequest = (e) => sendPost(e, nameForm);
-      const getUsers = (e) => sendGetHead(e, userForm);
+      const saveTheme = (e) => sendPost(e, saveButton, keywordField, colorCards);
+      const loadTheme = (e) => sendSavedThemeRequest(e, loadButton, keywordField);
 
 	    //attach the correct functions to the correct events
-      nameForm.addEventListener('submit', postRequest);
-      userForm.addEventListener('submit', getUsers);
+      loadButton.addEventListener('click', loadTheme);
+      saveButton.addEventListener('click', saveTheme);
     };
     
     window.onload = init;
   </script>
 </head>
 <body>
+
   <div id="header">
     <h1 id="title">ThemeMe</h1>
   </div>
@@ -153,65 +178,45 @@
         <option value="/getTwoTone">Two Tone</option>
         <option value="/getSingleColor">Single Color</option>
     </select>
-    <input id="file" type="file" class="inputfile"/>
+    <input id="imageUpload" type="file" class="inputfile"/>
     
     <h3>Save Your Theme</h3>
-    <form id="loadForm" action="/getSavedTheme" method="get">
-      <label for="keyword">Name: </label>
-      <input id="keywordField" type="text" name="keyword"/>
-      <input type="submit" value="Load"/>
-      <input type="submit" value="Save"/>
-    </form>
+    <label for="keyword">Keyword:   </label>
+    <input id="keywordField" type="text" name="keyword"/>
+    <button id="loadButton" action="/getSavedTheme" method="get">Load</button>
+    <button id="saveButton" action="/addTheme" method="post">Save</button>
+   
+    <section id="content">
+    </section>
 
-    
+    <!-- Float image to the right and restrict height the size of control div (just show a preview of the image)-->
+    <img id="imagePreview"/>
   </div>
 
+  <!-- set the default colors in html so AJAX script has access -->
   <div id="colors">
-    <div id="colorOne" class="colorCard">
+    <div style="background-color:rgb(136, 152, 184);" id="colorOne" class="colorCard">
       <p class="name">One</p>
-      <p>#hexval</p>
+      <p>rgb(136, 152, 184)</p>
     </div>
-    <div id="colorTwo" class="colorCard">
+    <div style="background-color: rgb(240, 220, 215);" id="colorTwo" class="colorCard">
       <p class="name">Two</p>
-      <p>#hexval</p>
+      <p>rgb(240, 220, 215)</p>
     </div>
-    <div id="colorThree" class="colorCard">
+    <div style="background-color: rgb(244, 155, 150);" id="colorThree" class="colorCard">
       <p class="name">Three</p>
-      <p>#hexval</p>
+      <p>rgb(244, 155, 150)</p>
     </div>
-    <div id="colorFour" class="colorCard">
+    <div style="background-color: rgb(78, 86, 125);" id="colorFour" class="colorCard">
       <p class="name">Four</p>
-      <p>#hexval</p>
+      <p>rgb(78, 86, 125)</p>
     </div>
-    <div id="colorFive" class="colorCard">
+    <div style="background-color: rgb(118, 181, 176);" id="colorFive" class="colorCard">
       <p class="name">Five</p>
-      <p>#hexval</p>
+      <p>rgb(118, 181, 176)</p>
     </div>
   </div>
-  <!-- HTML for API II Homework
-  <section id="top">
-    <h3>POST Status Code Tests</h3>
-    <form id="nameForm" action="/addUser" method="post">
-      <label for="name">Name: </label>
-      <input id="nameField" type="text" name="name" />
-      <label for="age">Age: </label>
-      <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
-      <input type="submit" value="Add User" />
-    </form>
-    <form id="userForm" action="/getUsers" method="get">
-      <select id='urlField'>
-        <option value='/getUsers'>/getUsers</option>
-        <option value='/notReal'>/notReal</option>
-      </select>
-      <select id="methodSelect">
-        <option value="get">GET</option>
-        <option value="head">HEAD</option>
-      </select>
-      <input type="submit" value="Get User" />
-    </form>
-  </section>
-  <section id="content">
-  </section> 
-  -->
+
+  
 </body>
 </html>

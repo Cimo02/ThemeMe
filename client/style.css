@@ -26,8 +26,7 @@ h1 {
 }
 
 #content {
-  margin-top: 100px;
-  font-size: 2em;
+  font-size: 1em;
   text-align: center;
 }
 
@@ -42,12 +41,29 @@ h1 {
 #colors {
   background-color: #3b3b3b;
   width: 80%;
-  height: 250px;
+  height: 300px;
   margin: auto;
+  margin-top: 50px;
   padding: 3%;
   border-radius: 5px;
   box-shadow: 10px 10px 5px #171717;
   text-align: center;
+}
+
+.inputfile+label {
+  margin-top: 26px;
+  padding: 24px;
+  font-family: Livvic;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  color: #000000;
+  background-color: #F8E71C;
+  display: inline-block;
+  cursor: pointer;
+  border: 3px solid #000000;
+  box-sizing: border-box;
+  border-radius: 8px;
 }
 
 .colorCard {
@@ -60,26 +76,13 @@ h1 {
   vertical-align: middle;
 }
 
+/* Set the edge boxes to have rounded edges */
 #colorOne {
-  background-color: #8898B8;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
 }
 
-#colorTwo {
-  background-color: #F0DCD7;
-}
-
-#colorThree {
-  background-color: #F49B96;
-}
-
-#colorFour {
-  background-color: #4E567D;
-}
-
 #colorFive {
-  background-color: #76B5B0;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }
@@ -95,8 +98,39 @@ h1 {
 input {
   border-radius: 5px;
   border-color: none;
+  font-family: realist, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  height:25px;
+}
+
+button {
+  background-color: #f5f5f5;
+  border-color: #f5f5f5;
+  font-family: realist, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  border-radius: 5px;
+  height:30px;
+  width:70px;
+  margin-left:10px;
 }
 
 .name {
   font-weight: 600;
+  font-size: 1.5em;
+}
+
+select {
+  font-family: realist, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  height: 25px;
+  border-radius: 5px;
+}
+
+option {
+  font-family: realist, sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
