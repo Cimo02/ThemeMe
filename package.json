@@ -1,0 +1,26 @@
+{
+  "name": "thememe",
+  "version": "1.0.0",
+  "description": "API that gets color scheme with image data",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Tests complete\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cimo02/ThemeMe.git"
+  },
+  "author": "Tyler Ciarmataro",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cimo02/ThemeMe/issues"
+  },
+  "homepage": "https://github.com/Cimo02/ThemeMe#readme",
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-plugin-import": "^2.18.2"
+  }
+}

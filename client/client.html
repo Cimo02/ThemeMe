@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ThemeMe</title>
+  <link rel="stylesheet" type="text/css" href="/style.css">
+  <link rel="stylesheet" href="https://use.typekit.net/ojh2mth.css"> <!-- Adobe Fonts Web Project -->
+  <meta charset="UTF-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+  <script type="text/babel">
+    //function to parse our response
+    const parseJSON = (xhr, content) => {
+      //parse response (obj will be empty in a 204 updated)
+      const obj = JSON.parse(xhr.response);
+      console.log(obj);
+      
+      //if message in response, add to screen
+      if(obj.message) {
+        const p = document.createElement('p');
+        p.textContent = `Message: ${obj.message}`;
+        content.appendChild(p);
+      }
+      
+      //if users in response, add to screen
+      if(obj.users) {
+        const userList = document.createElement('p');
+        const users = JSON.stringify(obj.users);
+        userList.textContent = users;
+        content.appendChild(userList);
+      }
+    };
+
+    //function to handle our response
+    const handleResponse = (xhr, parseResponse) => {
+      const content = document.querySelector('#content');
+      
+      //check the status code
+      switch(xhr.status) {
+        case 200: //success
+          content.innerHTML = `<b>Success</b>`;
+          break;
+        case 201: //created
+          content.innerHTML = '<b>Create</b>';
+          break;
+        case 204: //updated (no response back from server)
+          content.innerHTML = '<b>Updated (No Response)</b>';
+          return;
+        case 400: //bad request
+          content.innerHTML = `<b>Bad Request</b>`;
+          break;
+        case 404: //bad request
+          content.innerHTML = `<b>Resource Not Found</b>`;
+          break;
+        default: //any other status code
+          content.innerHTML = `Error code not implemented by client.`;
+          break;
+      }
+
+      //parse response if not HEAD request
+      if (parseResponse) { parseJSON(xhr, content); } 
+    };
+
+    //function to send our post request
+    const sendPost = (e, nameForm) => {
+      //grab the forms action (url to go to)
+      //and method (HTTP method - POST in this case)
+      const nameAction = nameForm.getAttribute('action');
+      const nameMethod = nameForm.getAttribute('method');
+      
+      //grab the form's name and age fields so we can check user input
+      const nameField = nameForm.querySelector('#nameField');
+      const ageField = nameForm.querySelector('#ageField');
+      
+      //create a new Ajax request (remember this is asynchronous)
+      const xhr = new XMLHttpRequest();
+      //set the method (POST) and url (action field from form)
+      xhr.open(nameMethod, nameAction);
+      
+      //set our request type to x-www-form-urlencoded
+      //which is one of the common types of form data. 
+      //This type has the same format as query strings key=value&key2=value2
+      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+      //set our requested response type in hopes of a JSON response
+      xhr.setRequestHeader ('Accept', 'application/json');
+      
+      //set our function to handle the response
+      xhr.onload = () => handleResponse(xhr, true);
+      
+      // add our field data to our request data
+      const formData = `name=${nameField.value}&age=${ageField.value}`;
+      
+      //send our request with the data
+      xhr.send(formData);
+    
+      //prevent the browser's default action (to send the form on its own)
+      e.preventDefault();
+      //return false to prevent the browser from trying to change page
+      return false;
+    };
+
+    const sendGetHead = (e, userForm) => {
+      const method = userForm.querySelector('#methodSelect').value;
+      const url = userForm.querySelector('#urlField').value; // always "/getUsers"???
+
+      // create and open a new AJAX request
+      const xhr = new XMLHttpRequest();
+
+      // open request
+      xhr.open(method, url);
+
+      xhr.setRequestHeader('Accept', 'application/json');
+
+      // handle the response
+      if (method == 'get'){
+        xhr.onload = () => handleResponse(xhr, true);
+      }
+      else {
+        xhr.onload = () => handleResponse(xhr, false);
+      }
+      
+      // send request
+      xhr.send();
+      //cancel browser's default action
+      e.preventDefault();
+      //return false to prevent page redirection from a form
+      return false;
+    };
+
+    const init = () => {
+      const nameForm = document.querySelector('#nameForm');
+      const userForm = document.querySelector('#userForm');
+
+	    //functions to call sendAjax for us with the correct parameters
+      const postRequest = (e) => sendPost(e, nameForm);
+      const getUsers = (e) => sendGetHead(e, userForm);
+
+	    //attach the correct functions to the correct events
+      nameForm.addEventListener('submit', postRequest);
+      userForm.addEventListener('submit', getUsers);
+    };
+    
+    window.onload = init;
+  </script>
+</head>
+<body>
+  <div id="header">
+    <h1 id="title">ThemeMe</h1>
+  </div>
+
+  <div id="controls">
+    <h3>Create Theme</h3>
+    <select id="themeSelect">
+        <option value="/getFiveColor">Five Color</option>
+        <option value="/getTwoTone">Two Tone</option>
+        <option value="/getSingleColor">Single Color</option>
+    </select>
+    <input id="file" type="file" class="inputfile"/>
+    
+    <h3>Save Theme</h3>
+    <form id="loadForm" action="/getSavedTheme" method="get">
+      <label for="keyword">Keyword: </label>
+      <input id="keywordField" type="text" name="keyword"/>
+      <input type="submit" value="Load"/>
+      <input type="submit" value="Save"/>
+    </form>
+
+    
+  </div>
+
+  <div id="colors">
+    <div id="colorOne" class="colorCard">
+      <p class="name">One</p>
+      <p>#hexval</p>
+    </div>
+    <div id="colorTwo" class="colorCard">
+      <p class="name">Two</p>
+      <p>#hexval</p>
+    </div>
+    <div id="colorThree" class="colorCard">
+      <p class="name">Three</p>
+      <p>#hexval</p>
+    </div>
+    <div id="colorFour" class="colorCard">
+      <p class="name">Four</p>
+      <p>#hexval</p>
+    </div>
+    <div id="colorFive" class="colorCard">
+      <p class="name">Five</p>
+      <p>#hexval</p>
+    </div>
+  </div>
+  <!-- HTML for API II Homework
+  <section id="top">
+    <h3>POST Status Code Tests</h3>
+    <form id="nameForm" action="/addUser" method="post">
+      <label for="name">Name: </label>
+      <input id="nameField" type="text" name="name" />
+      <label for="age">Age: </label>
+      <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
+      <input type="submit" value="Add User" />
+    </form>
+    <form id="userForm" action="/getUsers" method="get">
+      <select id='urlField'>
+        <option value='/getUsers'>/getUsers</option>
+        <option value='/notReal'>/notReal</option>
+      </select>
+      <select id="methodSelect">
+        <option value="get">GET</option>
+        <option value="head">HEAD</option>
+      </select>
+      <input type="submit" value="Get User" />
+    </form>
+  </section>
+  <section id="content">
+  </section> 
+  -->
+</body>
+</html>
