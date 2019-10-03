@@ -43,13 +43,11 @@ h1 {
   background-color: #3b3b3b;
   width: 80%;
   height: 250px;
-  margin-top: 35px;
   margin: auto;
   padding: 3%;
   border-radius: 5px;
   box-shadow: 10px 10px 5px #171717;
   text-align: center;
-  vertical-align: middle;
 }
 
 .colorCard {
@@ -59,6 +57,7 @@ h1 {
   width: 19%;
   height: 100%;
   color: #3b3b3b;
+  vertical-align: middle;
 }
 
 #colorOne {
@@ -90,6 +89,7 @@ h1 {
   width: 80%;
   padding:3%;
   margin: auto;
+  margin-bottom: 30px;
 }
 
 input {
