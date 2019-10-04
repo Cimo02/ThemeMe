@@ -14,6 +14,7 @@ const urlStruct = {
     '/style.css': htmlHandler.getCSS,
     '/getNewTheme': jsonHandler.getNewTheme,
     '/getSavedTheme': jsonHandler.getSavedTheme,
+    '/getThemes':jsonHandler.getThemes,
     notReal: jsonHandler.notReal,
   },
   HEAD: {

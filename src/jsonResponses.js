@@ -1,7 +1,7 @@
 // clears when the server shuts down
 const themes = {
-  testTheme: {
-    keyword: 'testTheme', colorOne: '#FFC000', colorTwo: '#FFA600', colorThree: '#FF8001', colorFour: '#FF5E03', colorFive: '#FF5004',
+  test: {
+    keyword: 'test', colorOne: '#FFC000', colorTwo: '#FFA600', colorThree: '#FF8001', colorFour: '#FF5E03', colorFive: '#FF5004',
   },
 };
 
@@ -21,42 +21,71 @@ const getNewTheme = (request, response) => {
 
 };
 
-const getSavedThemes = (request, response, body) => {
-  const responseJSON = {
-    message: themes[body.keyword],
-  };
+const getNewThemeMeta = (request, response) => {
 
-  // check for missing params
-  if (!body.keyword) {
-    responseJSON.id = 'missingParams';
-    return respondJSON(request, response, 400, responseJSON);
+};
+*/
+
+const getThemesMeta = (request, response) => {
+  if (!themes) { // if there are no saved themes return with a 404
+    return respondJSON(request, response, 404);
   }
 
-  responseJSON.theme = themes[body.keyword];
-  responseJSON.message = 'Success';
+  return respondJSON(request, response, 200);
+};
+
+const getThemes = (request, response) => {
+  if (!themes) { // if there are no saved themes return with a 404
+    const responseJSON = {
+      message: 'The resource you are looking for was not found.',
+      id: 'notFound',
+    };
+
+    return respondJSON(request, response, 404, respondJSON);
+  }
+  
+  const respondJSON = {
+    themes: themes,
+    message: 'Success',
+  };
 
   return respondJSON(request, response, 200, responseJSON);
 };
 
-const getSavedThemesMeta = (request, response) => respondJSONHead(request, response, 200);
-*/
-const getSavedTheme = (request, response, query) => {
+const getSavedThemeMeta = (request, response) => {
   let responseJSON;
   let queryStrings;
 
   console.log(query);
   if (query != null) {
+   queryStrings = query.split('=');
+  }
+
+  // setup error handling for key not found
+  if (!themes[queryStrings[1]]) {
+    // return a 404 
+    return respondJSONHead(request, response, 404);
+  }
+
+  return respondJSONHead(request, response, 200);
+}
+
+const getSavedTheme = (request, response, query) => {
+  let responseJSON;
+  let queryStrings;
+
+  if (query != null) {
     queryStrings = query.split('=');
   }
 
-  console.log(queryStrings[1]);
   // setup error handling for key not found
   if (themes[queryStrings[1]]) {
     responseJSON = {
       message: 'Success',
       theme: themes[queryStrings[1]],
     };
-  } else {
+  } 
+  else {
     // create error message for response if theme wasn't found
     responseJSON = {
       message: 'The resource you are looking for was not found.',
@@ -131,5 +160,8 @@ module.exports = {
   notReal,
   notRealMeta,
   getSavedTheme,
+  getSavedThemeMeta,
+  getThemes,
+  getThemesMeta,
   addTheme,
 };

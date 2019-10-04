@@ -20,6 +20,13 @@
         content.appendChild(p);
       }
       
+      if(obj.themes) {
+        const savedThemes = document.createElement('p');
+        p.textContent = 'Saved Themes: ';
+        obj.themes.forEach( function(element) {
+          p.textContent += `, ${element.keyword}`;
+        });
+      }
       //if users in response, add to screen
       if(obj.theme) {
         console.log(obj.theme);
@@ -112,15 +119,22 @@
       // send it
     };
 
-    const sendSavedThemeRequest = (e, loadButton, keywordField) => {
+    const sendThemeRequest = (e, loadButton, keywordField) => {
       const method = loadButton.getAttribute('method');
-      const action = loadButton.getAttribute('action');
+      const buttonAction = loadButton.getAttribute('action');
 
       // create and open a new AJAX request
       const xhr = new XMLHttpRequest();
       
+      let action;
       // open request
-      xhr.open(method, action + `?keyword=${keywordField.value}`);
+      if (buttonAction === '/getSavedTheme') {
+        action = buttonAction + `?keyword=${keywordField.value}`;
+      } else {
+        action = buttonAction;
+      }
+
+      xhr.open(method, action);
 
       // set request header
       xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
@@ -144,6 +158,8 @@
     const init = () => {
       const loadButton = document.querySelector('#loadButton');
       const saveButton = document.querySelector('#saveButton');
+      const themeButton = document.querySelector('#themeButton');
+
       const keywordField = document.querySelector('#keywordField');
       const colorCards = [
         document.querySelector('#colorOne'),
@@ -155,7 +171,7 @@
 
 	    //functions to call sendAjax for us with the correct parameters
       const saveTheme = (e) => sendPost(e, saveButton, keywordField, colorCards);
-      const loadTheme = (e) => sendSavedThemeRequest(e, loadButton, keywordField);
+      const loadTheme = (e) => sendThemeRequest(e, loadButton, keywordField);
 
 	    //attach the correct functions to the correct events
       loadButton.addEventListener('click', loadTheme);
@@ -175,7 +191,7 @@
   <div id="controls">
     <!-- Float image to the right and restrict height the size of control div (just show a preview of the image)-->
     <div id="image">
-      <label>Image Preview</label>
+      <label>Theme Image</label>
     </div>
 
     <h3>Create A Theme</h3>
@@ -191,10 +207,10 @@
     <input id="keywordField" type="text" name="keyword"/>
     <button id="loadButton" action="/getSavedTheme" method="get">Load</button>
     <button id="saveButton" action="/addTheme" method="post">Save</button>
+    <button id="themesButton" action="/getThemes" method="get">Themes</button>
     
     <section id="content">
     </section>
-
   </div>
 
   <!-- set the default colors in html so AJAX script has access -->
@@ -221,6 +237,5 @@
     </div>
   </div>
 
-  
 </body>
 </html>
