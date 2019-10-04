@@ -1,7 +1,7 @@
 // clears when the server shuts down
 const themes = {
   testTheme: {
-    keyword: 'testTheme', colorOne: '#8898B8', colorTwo: '#F0DCD7', colorThree: '#F49B96', colorFour: '#4E567D', colorFive: '#76B5B0',
+    keyword: 'testTheme', colorOne: '#FFC000', colorTwo: '#FFA600', colorThree: '#FF8001', colorFour: '#FF5E03', colorFive: '#FF5004',
   },
 };
 
@@ -16,34 +16,16 @@ const respondJSONHead = (request, response, status) => {
   response.end();
 };
 
+/*
 const getNewTheme = (request, response) => {
 
-};
-
-const getSavedTheme = (request, response, keyword) => {
-  let responseJSON;
-  // setup error handling for key not found
-  if (themes[keyword] != null) {
-    responseJSON = themes[keyword];
-  } else {
-    // create error message for response if theme wasn't found
-    responseJSON = {
-      message: 'The resource you are looking for was not found.',
-      id: 'notFound',
-    };
-
-    // return a 404 with an error message
-    return respondJSON(request, response, 404, responseJSON);
-  }
-
-  return respondJSON(request, response, 200, responseJSON);
 };
 
 const getSavedThemes = (request, response, body) => {
   const responseJSON = {
     message: themes[body.keyword],
   };
-  
+
   // check for missing params
   if (!body.keyword) {
     responseJSON.id = 'missingParams';
@@ -57,6 +39,36 @@ const getSavedThemes = (request, response, body) => {
 };
 
 const getSavedThemesMeta = (request, response) => respondJSONHead(request, response, 200);
+*/
+const getSavedTheme = (request, response, query) => {
+  let responseJSON;
+  let queryStrings;
+
+  console.log(query);
+  if (query != null) {
+    queryStrings = query.split('=');
+  }
+
+  console.log(queryStrings[1]);
+  // setup error handling for key not found
+  if (themes[queryStrings[1]]) {
+    responseJSON = {
+      message: 'Success',
+      theme: themes[queryStrings[1]],
+    };
+  } else {
+    // create error message for response if theme wasn't found
+    responseJSON = {
+      message: 'The resource you are looking for was not found.',
+      id: 'notFound',
+    };
+
+    // return a 404 with an error message
+    return respondJSON(request, response, 404, responseJSON);
+  }
+
+  return respondJSON(request, response, 200, responseJSON);
+};
 
 const addTheme = (request, response, body) => {
   // default json message
@@ -115,49 +127,9 @@ const notRealMeta = (request, response) => {
   respondJSONHead(request, response, 404);
 };
 
-/*
-const addUser = (request, response, body) => {
-  // default json message
-  const responseJSON = {
-    message: 'Name and age are required.',
-  };
-
-  // check for missing params
-  if (!body.name || !body.age) {
-    responseJSON.id = 'missingParams';
-    return respondJSON(request, response, 400, responseJSON);
-  }
-
-  // default status code to 201 created
-  let responseCode = 201;
-
-  // check to see that the user doesn't already exist
-  if (users[body.name]) {
-    responseCode = 204;
-  } else {
-    // otherwise create an object with that name
-    users[body.name] = {};
-  }
-
-  // add or update fields for this user name
-  users[body.name].name = body.name;
-  users[body.name].age = body.age;
-
-  // if response is created, then set our created message
-  // and sent response with a message
-  if (responseCode === 201) {
-    responseJSON.message = 'Created Successfully';
-    return respondJSON(request, response, responseCode, responseJSON);
-  }
-  // Response without content if the user already exists
-  return respondJSONHead(request, response, responseCode);
-};
-*/
-
 module.exports = {
   notReal,
   notRealMeta,
-  getNewTheme,
   getSavedTheme,
   addTheme,
 };

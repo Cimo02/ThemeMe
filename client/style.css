@@ -22,7 +22,11 @@ h1 {
   font-size: 4em;
   color: #f5f5f5;
   margin: 0;
-  padding: 30px;
+  padding-top: 13px;
+}
+
+#subtitle {
+  margin-top: 0;
 }
 
 #content {
@@ -133,4 +137,8 @@ option {
   font-family: realist, sans-serif;
   font-weight: 400;
   font-style: normal;
+}
+
+#image {
+  float: right;
 }

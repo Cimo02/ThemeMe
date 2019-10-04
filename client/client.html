@@ -22,12 +22,17 @@
       
       //if users in response, add to screen
       if(obj.theme) {
-        /*
-        const userList = document.createElement('p');
-        const users = JSON.stringify(obj.users);
-        userList.textContent = users;
-        content.appendChild(userList);
-        */
+        console.log(obj.theme);
+        
+        // re-color title/subtitle
+        document.querySelector('#title').style.color = obj.theme.colorOne;
+
+        // re-color cards
+        document.querySelector('#colorOne').style.backgroundColor = obj.theme.colorOne;
+        document.querySelector('#colorTwo').style.backgroundColor = obj.theme.colorTwo;
+        document.querySelector('#colorThree').style.backgroundColor = obj.theme.colorThree;
+        document.querySelector('#colorFour').style.backgroundColor = obj.theme.colorFour;
+        document.querySelector('#colorFive').style.backgroundColor = obj.theme.colorFive;
       }
     };
 
@@ -64,7 +69,7 @@
     // for saving themes to the server
     const sendPost = (e, saveButton, keywordField, colorCards) => {
       //grab the forms action (url to go to)
-      console.log("saving theme...")
+      console.log("saving theme...");
       //and method (HTTP method - POST in this case)
       const saveAction = saveButton.getAttribute('action');
       const saveMethod = saveButton.getAttribute('method');
@@ -111,12 +116,11 @@
       const method = loadButton.getAttribute('method');
       const action = loadButton.getAttribute('action');
 
-      console.log(action + " " + method);
       // create and open a new AJAX request
       const xhr = new XMLHttpRequest();
-
+      
       // open request
-      xhr.open(method, action);
+      xhr.open(method, action + `?keyword=${keywordField.value}`);
 
       // set request header
       xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
@@ -129,12 +133,8 @@
       else {
         xhr.onload = () => handleResponse(xhr, false);
       }
-      
-      // send request
-      const keyword = `keyword=${keywordField.value}`;
-      console.log(keyword);
 
-      xhr.send(keyword);
+      xhr.send();
       //cancel browser's default action
       e.preventDefault();
       //return false to prevent page redirection from a form
@@ -169,9 +169,15 @@
 
   <div id="header">
     <h1 id="title">ThemeMe</h1>
+    <h3 id="subtitle">by Tyler Ciarmataro</h3>
   </div>
 
   <div id="controls">
+    <!-- Float image to the right and restrict height the size of control div (just show a preview of the image)-->
+    <div id="image">
+      <label>Image Preview</label>
+    </div>
+
     <h3>Create A Theme</h3>
     <select id="themeSelect">
         <option value="/getFiveColor">Five Color</option>
@@ -179,18 +185,16 @@
         <option value="/getSingleColor">Single Color</option>
     </select>
     <input id="imageUpload" type="file" class="inputfile"/>
-    
+
     <h3>Save Your Theme</h3>
-    <label for="keyword">Keyword:   </label>
+    <label for="keyword">Keyword: </label>
     <input id="keywordField" type="text" name="keyword"/>
     <button id="loadButton" action="/getSavedTheme" method="get">Load</button>
     <button id="saveButton" action="/addTheme" method="post">Save</button>
-   
+    
     <section id="content">
     </section>
 
-    <!-- Float image to the right and restrict height the size of control div (just show a preview of the image)-->
-    <img id="imagePreview"/>
   </div>
 
   <!-- set the default colors in html so AJAX script has access -->
