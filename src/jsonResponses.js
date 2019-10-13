@@ -16,23 +16,78 @@ const respondJSONHead = (request, response, status) => {
   response.end();
 };
 
-const getSavedThemeMeta = (request, response) => {
-  let responseJSON;
+const createRandomColor = () => {
+  // within okay looking color boundaries
+  const R = Math.trunc(Math.random() * 175) + 25;
+  const G = Math.trunc(Math.random() * 175) + 25;
+  const B = Math.trunc(Math.random() * 175) + 25;
+
+  const colorString = `rgb(${R}, ${G}, ${B})`;
+  return colorString;
+};
+
+const createTwoTone = () => {
+  const ROne = Math.trunc(Math.random() * 255);
+  const GOne = Math.trunc(Math.random() * 255);
+  const BOne = Math.trunc(Math.random() * 255);
+
+  const colorOneString = `rgb(${ROne}, ${GOne}, ${BOne})`;
+  const colorTwoString = `rgb(${ROne + 20}, ${GOne + 20}, ${BOne + 20})`;
+
+  const RTwo = Math.trunc(Math.random() * 255);
+  const GTwo = Math.trunc(Math.random() * 255);
+  const BTwo = Math.trunc(Math.random() * 255);
+
+  const colorThreeString = `rgb(${RTwo}, ${GTwo}, ${BTwo})`;
+  const colorFourString = `rgb(${RTwo + 20}, ${GTwo + 20}, ${BTwo + 20})`;
+  const colorFiveString = `rgb(${RTwo + 40}, ${GTwo + 40}, ${BTwo + 40})`;
+
+  const theme = {
+    colorOne: colorOneString,
+    colorTwo: colorTwoString,
+    colorThree: colorThreeString,
+    colorFour: colorFourString,
+    colorFive: colorFiveString,
+  };
+  return theme;
+};
+
+const createSingleColor = () => {
+  const R = Math.trunc(Math.random() * 255);
+  const G = Math.trunc(Math.random() * 255);
+  const B = Math.trunc(Math.random() * 255);
+
+  const colorOneString = `rgb(${R - 60}, ${G - 60}, ${B - 60})`;
+  const colorTwoString = `rgb(${R - 30}, ${G - 30}, ${B - 30})`;
+  const colorThreeString = `rgb(${R}, ${G}, ${B})`;
+  const colorFourString = `rgb(${R + 30}, ${G + 30}, ${B + 30})`;
+  const colorFiveString = `rgb(${R + 60}, ${G + 60}, ${B + 60})`;
+
+  const theme = {
+    colorOne: colorOneString,
+    colorTwo: colorTwoString,
+    colorThree: colorThreeString,
+    colorFour: colorFourString,
+    colorFive: colorFiveString,
+  };
+  return theme;
+};
+
+const getSavedThemeMeta = (request, response, query) => {
   let queryStrings;
 
-  console.log(query);
   if (query != null) {
-   queryStrings = query.split('=');
+    queryStrings = query.split('=');
   }
 
   // setup error handling for key not found
   if (!themes[queryStrings[1]]) {
-    // return a 404 
+    // return a 404
     return respondJSONHead(request, response, 404);
   }
 
   return respondJSONHead(request, response, 200);
-}
+};
 
 const getSavedTheme = (request, response, query) => {
   let responseJSON;
@@ -48,8 +103,7 @@ const getSavedTheme = (request, response, query) => {
       message: 'Success',
       theme: themes[queryStrings[1]],
     };
-  } 
-  else {
+  } else {
     // create error message for response if theme wasn't found
     responseJSON = {
       message: 'The resource you are looking for was not found.',
@@ -63,40 +117,54 @@ const getSavedTheme = (request, response, query) => {
   return respondJSON(request, response, 200, responseJSON);
 };
 
-// if I can't get images working, just have it create a random theme based on the type and return it. 
+// create a new random theme
 const getNewTheme = (request, response, query) => {
-  let responseJSON;
-  let url;
+  let baseColor;
   let type;
+  const typeIndex = 1;
+  const baseColorIndex = 1;
 
   if (query != null) {
-    let queryStrings = query.split('&');
-    type = queryStrings[0].split('=')[1];
-    url = queryStrings[1].split('=')[1];
+    const queryStrings = query.split('&');
+    type = queryStrings[0].split('=')[typeIndex];
+    baseColor = queryStrings[1].split('=')[baseColorIndex];
   }
-
-  if (!url) {
-    responseJSON = {
-      message: 'An image url is required',
-      id: 'missingParams',
-    };
-
-    return respondJSON(request, response, 400, responseJSON);
-  }
-
-  // get image
 
   let theme = {
-    colorOne: "rgb(57, 41, 64)",
-    colorTwo: "rgb(242, 233, 99)",
-    colorThree: "rgb(242, 148, 65)",
-    colorFour: "rgb(217, 107, 67)",
-    colorFive: "rgb(40, 40, 40)"
+    colorOne: '',
+    colorTwo: '',
+    colorThree: '',
+    colorFour: '',
+    colorFive: '',
   };
 
-  responseJSON = {
+  let colorOne = createRandomColor();
+  if (baseColor !== '') { colorOne = baseColor; }
+
+  switch (type) {
+    case 'fiveColor': // five random colors
+      theme = {
+        colorOne,
+        colorTwo: createRandomColor(),
+        colorThree: createRandomColor(),
+        colorFour: createRandomColor(),
+        colorFive: createRandomColor(),
+      };
+      break;
+    case 'twoTone': // two random colors
+      theme = createTwoTone();
+      break;
+    case 'singleColor':
+      theme = createSingleColor();
+      break;
+    default:
+      theme = createTwoTone();
+      break;
+  }
+
+  const responseJSON = {
     message: 'Success',
-    theme: theme,
+    theme,
   };
   // get most popular color here
   // switch statement to check type and assign colors
@@ -104,15 +172,13 @@ const getNewTheme = (request, response, query) => {
   return respondJSON(request, response, 200, responseJSON);
 };
 
-const getNewThemeMeta = (request, response) => {
-  let responseJSON;
+const getNewThemeMeta = (request, response, query) => {
   let url;
-  let type;
+  const urlIndex = 1;
 
   if (query != null) {
-    let queryStrings = query.split('&');
-    type = queryStrings[0].split('=')[1];
-    url = queryStrings[1].split('=')[1];
+    const queryStrings = query.split('&');
+    url = queryStrings[1].split('=')[urlIndex];
   }
 
   if (!url) {
@@ -139,15 +205,14 @@ const getThemes = (request, response) => {
 
     return respondJSON(request, response, 404, responseJSON);
   }
-  
+
   const responseJSON = {
-    themes: themes,
+    themes,
     message: 'Success',
   };
 
   return respondJSON(request, response, 200, responseJSON);
 };
-
 
 
 const addTheme = (request, response, body) => {
@@ -206,29 +271,6 @@ const notRealMeta = (request, response) => {
   // return a 404 without an error message
   respondJSONHead(request, response, 404);
 };
-
-/*
-function getBase64FromImageUrl(url) {
-  var img = new Image();
-
-  img.setAttribute('crossOrigin', 'anonymous');
-
-  img.onload = function () {
-      var canvas = document.createElement("canvas");
-      canvas.width =this.width;
-      canvas.height =this.height;
-
-      var ctx = canvas.getContext("2d");
-      ctx.drawImage(this, 0, 0);
-
-      var dataURL = canvas.toDataURL("image/png");
-
-      alert(dataURL.replace(/^data:image\/(png|jpg);base64,/, ""));
-  };
-
-  img.src = url;
-}
-*/
 
 module.exports = {
   notReal,

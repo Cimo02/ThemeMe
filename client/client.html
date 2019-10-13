@@ -46,6 +46,12 @@
         document.querySelector('#colorThree').style.backgroundColor = obj.theme.colorThree;
         document.querySelector('#colorFour').style.backgroundColor = obj.theme.colorFour;
         document.querySelector('#colorFive').style.backgroundColor = obj.theme.colorFive;
+
+        document.querySelector('#valueOne').innerHTML = obj.theme.colorOne;
+        document.querySelector('#valueTwo').innerHTML = obj.theme.colorTwo;
+        document.querySelector('#valueThree').innerHTML = obj.theme.colorThree;
+        document.querySelector('#valueFour').innerHTML = obj.theme.colorFour;
+        document.querySelector('#valueFive').innerHTML = obj.theme.colorFive;
       }
     };
 
@@ -210,13 +216,8 @@
   </div>
 
   <div id="controls">
-    <!-- Float image to the right and restrict height the size of control div (just show a preview of the image)-->
-    <div id="image">
-      <label>Theme Image</label>
-    </div>
-
     <h3>Create A Theme</h3>
-    <label for="url">Image Url: </label>
+    <label for="url">Primary Color(Optional): </label>
     <input id="urlField" type="text" name="url"/>
     <select id="themeSelect">
         <option value="fiveColor">Five Color</option>
@@ -225,38 +226,40 @@
     </select>
     <button id="createButton" action="/getNewTheme" method="get">Create</button>
 
+    <div id="image">
+      <section id="content">
+      </section>
+    </div>
+
     <h3>Save Your Theme</h3>
     <label for="keyword">Keyword: </label>
     <input id="keywordField" type="text" name="keyword"/>
     <button id="loadButton" action="/getSavedTheme" method="get">Load</button>
     <button id="saveButton" action="/addTheme" method="post">Save</button>
     <button id="themeButton" action="/getThemes" method="get">Themes</button>
-    
-    <section id="content">
-    </section>
   </div>
 
   <!-- set the default colors in html so AJAX script has access -->
   <div id="colors">
     <div style="background-color:rgb(136, 152, 184);" id="colorOne" class="colorCard">
       <p class="name">One</p>
-      <p>rgb(136, 152, 184)</p>
+      <p id="valueOne">rgb(136, 152, 184)</p>
     </div>
     <div style="background-color: rgb(240, 220, 215);" id="colorTwo" class="colorCard">
       <p class="name">Two</p>
-      <p>rgb(240, 220, 215)</p>
+      <p id="valueTwo">rgb(240, 220, 215)</p>
     </div>
     <div style="background-color: rgb(244, 155, 150);" id="colorThree" class="colorCard">
       <p class="name">Three</p>
-      <p>rgb(244, 155, 150)</p>
+      <p id="valueThree">rgb(244, 155, 150)</p>
     </div>
     <div style="background-color: rgb(78, 86, 125);" id="colorFour" class="colorCard">
       <p class="name">Four</p>
-      <p>rgb(78, 86, 125)</p>
+      <p id="valueFour">rgb(78, 86, 125)</p>
     </div>
     <div style="background-color: rgb(118, 181, 176);" id="colorFive" class="colorCard">
       <p class="name">Five</p>
-      <p>rgb(118, 181, 176)</p>
+      <p id="valueFive">rgb(118, 181, 176)</p>
     </div>
   </div>
 
