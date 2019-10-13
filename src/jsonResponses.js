@@ -16,42 +16,6 @@ const respondJSONHead = (request, response, status) => {
   response.end();
 };
 
-/*
-const getNewTheme = (request, response) => {
-
-};
-
-const getNewThemeMeta = (request, response) => {
-
-};
-*/
-
-const getThemesMeta = (request, response) => {
-  if (!themes) { // if there are no saved themes return with a 404
-    return respondJSON(request, response, 404);
-  }
-
-  return respondJSON(request, response, 200);
-};
-
-const getThemes = (request, response) => {
-  if (!themes) { // if there are no saved themes return with a 404
-    const responseJSON = {
-      message: 'The resource you are looking for was not found.',
-      id: 'notFound',
-    };
-
-    return respondJSON(request, response, 404, respondJSON);
-  }
-  
-  const respondJSON = {
-    themes: themes,
-    message: 'Success',
-  };
-
-  return respondJSON(request, response, 200, responseJSON);
-};
-
 const getSavedThemeMeta = (request, response) => {
   let responseJSON;
   let queryStrings;
@@ -98,6 +62,93 @@ const getSavedTheme = (request, response, query) => {
 
   return respondJSON(request, response, 200, responseJSON);
 };
+
+// if I can't get images working, just have it create a random theme based on the type and return it. 
+const getNewTheme = (request, response, query) => {
+  let responseJSON;
+  let url;
+  let type;
+
+  if (query != null) {
+    let queryStrings = query.split('&');
+    type = queryStrings[0].split('=')[1];
+    url = queryStrings[1].split('=')[1];
+  }
+
+  if (!url) {
+    responseJSON = {
+      message: 'An image url is required',
+      id: 'missingParams',
+    };
+
+    return respondJSON(request, response, 400, responseJSON);
+  }
+
+  // get image
+
+  let theme = {
+    colorOne: "rgb(57, 41, 64)",
+    colorTwo: "rgb(242, 233, 99)",
+    colorThree: "rgb(242, 148, 65)",
+    colorFour: "rgb(217, 107, 67)",
+    colorFive: "rgb(40, 40, 40)"
+  };
+
+  responseJSON = {
+    message: 'Success',
+    theme: theme,
+  };
+  // get most popular color here
+  // switch statement to check type and assign colors
+
+  return respondJSON(request, response, 200, responseJSON);
+};
+
+const getNewThemeMeta = (request, response) => {
+  let responseJSON;
+  let url;
+  let type;
+
+  if (query != null) {
+    let queryStrings = query.split('&');
+    type = queryStrings[0].split('=')[1];
+    url = queryStrings[1].split('=')[1];
+  }
+
+  if (!url) {
+    return respondJSON(request, response, 400);
+  }
+
+  return respondJSON(request, response, 200);
+};
+
+const getThemesMeta = (request, response) => {
+  if (themes.length < 1) { // if there are no saved themes return with a 404
+    return respondJSON(request, response, 404);
+  }
+
+  return respondJSON(request, response, 200);
+};
+
+const getThemes = (request, response) => {
+  if (themes.length < 1) { // if there are no saved themes return with a 404
+    const responseJSON = {
+      message: 'The resource you are looking for was not found.',
+      id: 'notFound',
+    };
+
+    return respondJSON(request, response, 404, responseJSON);
+  }
+  
+  const responseJSON = {
+    themes: themes,
+    message: 'Success',
+  };
+
+  return respondJSON(request, response, 200, responseJSON);
+};
+
+
 
 const addTheme = (request, response, body) => {
   // default json message
@@ -156,6 +207,29 @@ const notRealMeta = (request, response) => {
   respondJSONHead(request, response, 404);
 };
 
+/*
+function getBase64FromImageUrl(url) {
+  var img = new Image();
+
+  img.setAttribute('crossOrigin', 'anonymous');
+
+  img.onload = function () {
+      var canvas = document.createElement("canvas");
+      canvas.width =this.width;
+      canvas.height =this.height;
+
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(this, 0, 0);
+
+      var dataURL = canvas.toDataURL("image/png");
+
+      alert(dataURL.replace(/^data:image\/(png|jpg);base64,/, ""));
+  };
+
+  img.src = url;
+}
+*/
+
 module.exports = {
   notReal,
   notRealMeta,
@@ -164,4 +238,6 @@ module.exports = {
   getThemes,
   getThemesMeta,
   addTheme,
+  getNewTheme,
+  getNewThemeMeta,
 };

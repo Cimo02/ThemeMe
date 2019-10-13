@@ -20,6 +20,7 @@ const urlStruct = {
   HEAD: {
     '/getNewTheme': jsonHandler.getNewThemeMeta,
     '/getSavedTheme': jsonHandler.getSavedThemeMeta,
+    '/getThemes': jsonHandler.getThemesMeta,
     notReal: jsonHandler.notRealMeta,
   },
 };
@@ -59,8 +60,10 @@ const onRequest = (request, response) => {
   // parse the url using the url module
   const parsedUrl = url.parse(request.url);
 
-  if (parsedUrl.pathname === '/getSavedTheme') {
+  if (parsedUrl.pathname === '/getSavedTheme' && request.method === 'GET') {
     jsonHandler.getSavedTheme(request, response, parsedUrl.query);
+  } else if (parsedUrl.pathname === '/getNewTheme'  && request.method === 'GET'){
+    jsonHandler.getNewTheme(request, response, parsedUrl.query);
   } else if (request.method === 'POST') {
     handleAddTheme(request, response);
   } else if (urlStruct[request.method][parsedUrl.pathname]) {

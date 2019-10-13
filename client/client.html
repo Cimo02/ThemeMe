@@ -9,25 +9,31 @@
   <script type="text/babel">
     //function to parse our response
     const parseJSON = (xhr, content) => {
-      //parse response (obj will be empty in a 204 updated)
+      // parse response (obj will be empty in a 204 updated)
       const obj = JSON.parse(xhr.response);
       console.log(obj);
       
-      //if message in response, add to screen
+      // if message in response, add to screen
       if(obj.message) {
         const p = document.createElement('p');
         p.textContent = `Message: ${obj.message}`;
         content.appendChild(p);
       }
       
+      // if themes in response, display theme
       if(obj.themes) {
-        const savedThemes = document.createElement('p');
-        p.textContent = 'Saved Themes: ';
-        obj.themes.forEach( function(element) {
-          p.textContent += `, ${element.keyword}`;
+        const p = document.createElement('p');
+        let themesString = 'Saved Themes: ';
+
+        Object.keys(obj.themes).forEach(function(k){
+          themesString += ` ${obj.themes[k].keyword},`;
         });
+
+        p.textContent = themesString;
+        content.appendChild(p);
       }
-      //if users in response, add to screen
+
+      // if theme in response, update screen
       if(obj.theme) {
         console.log(obj.theme);
         
@@ -74,7 +80,7 @@
     };
 
     // for saving themes to the server
-    const sendPost = (e, saveButton, keywordField, colorCards) => {
+    const sendSaveTheme = (e, saveButton, keywordField, colorCards) => {
       //grab the forms action (url to go to)
       console.log("saving theme...");
       //and method (HTTP method - POST in this case)
@@ -119,18 +125,28 @@
       // send it
     };
 
-    const sendThemeRequest = (e, loadButton, keywordField) => {
-      const method = loadButton.getAttribute('method');
-      const buttonAction = loadButton.getAttribute('action');
+    const sendThemeRequest = (e, button) => {
+      const method = button.getAttribute('method');
+      const buttonAction = button.getAttribute('action');
 
       // create and open a new AJAX request
       const xhr = new XMLHttpRequest();
       
       let action;
       // open request
+      // if we're loading a saved theme
       if (buttonAction === '/getSavedTheme') {
+        const keywordField = document.querySelector('#keywordField');
         action = buttonAction + `?keyword=${keywordField.value}`;
-      } else {
+      } 
+      // if we're requesting a new theme
+      else if (buttonAction === '/getNewTheme') {
+        const type = document.querySelector('#themeSelect').value;
+        const url = document.querySelector('#urlField').value;
+        action = buttonAction + `?type=${type}&url=${url}`; 
+      } 
+      // if we're getting anything else without parameters
+      else {
         action = buttonAction;
       }
 
@@ -159,6 +175,7 @@
       const loadButton = document.querySelector('#loadButton');
       const saveButton = document.querySelector('#saveButton');
       const themeButton = document.querySelector('#themeButton');
+      const createButton = document.querySelector('#createButton');
 
       const keywordField = document.querySelector('#keywordField');
       const colorCards = [
@@ -170,12 +187,16 @@
       ];
 
 	    //functions to call sendAjax for us with the correct parameters
-      const saveTheme = (e) => sendPost(e, saveButton, keywordField, colorCards);
-      const loadTheme = (e) => sendThemeRequest(e, loadButton, keywordField);
+      const saveTheme = (e) => sendSaveTheme(e, saveButton, keywordField, colorCards);
+      const loadTheme = (e) => sendThemeRequest(e, loadButton);
+      const loadThemes = (e) => sendThemeRequest(e, themeButton);
+      const createTheme = (e) => sendThemeRequest(e, createButton);
 
 	    //attach the correct functions to the correct events
       loadButton.addEventListener('click', loadTheme);
       saveButton.addEventListener('click', saveTheme);
+      themeButton.addEventListener('click', loadThemes);
+      createButton.addEventListener('click', createTheme);
     };
     
     window.onload = init;
@@ -195,19 +216,21 @@
     </div>
 
     <h3>Create A Theme</h3>
+    <label for="url">Image Url: </label>
+    <input id="urlField" type="text" name="url"/>
     <select id="themeSelect">
-        <option value="/getFiveColor">Five Color</option>
-        <option value="/getTwoTone">Two Tone</option>
-        <option value="/getSingleColor">Single Color</option>
+        <option value="fiveColor">Five Color</option>
+        <option value="twoTone">Two Tone</option>
+        <option value="singleColor">Single Color</option>
     </select>
-    <input id="imageUpload" type="file" class="inputfile"/>
+    <button id="createButton" action="/getNewTheme" method="get">Create</button>
 
     <h3>Save Your Theme</h3>
     <label for="keyword">Keyword: </label>
     <input id="keywordField" type="text" name="keyword"/>
     <button id="loadButton" action="/getSavedTheme" method="get">Load</button>
     <button id="saveButton" action="/addTheme" method="post">Save</button>
-    <button id="themesButton" action="/getThemes" method="get">Themes</button>
+    <button id="themeButton" action="/getThemes" method="get">Themes</button>
     
     <section id="content">
     </section>
